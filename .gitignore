@@ -1,0 +1,5 @@
+# This is a comment in the .gitignore file
+.env* 
+__pycache__
+.DS_Store
+.vscode
