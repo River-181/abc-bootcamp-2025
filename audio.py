@@ -25,7 +25,6 @@ def play_file(file_path: str) -> None:
 
 def say(message: str, lang: str) -> None:
     # io = BytesIO()
-
     tts = gTTS(message, lang=lang)
 
     # 1) 파일 직접 저장없이 처리하고자 할 때에
