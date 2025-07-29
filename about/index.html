@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김주용 - 사람과 컴퓨터를 연결하는 심리학도</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        /* 커스텀 스크롤바 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 3px;
+        }
+        
+        /* 부드러운 애니메이션 */
+        .smooth-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 호버 효과 */
+        .hover-lift:hover {
+            transform: translateY(-4px);
+        }
+        
+        /* 그라데이션 */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ff9e35 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 다크모드 그라데이션 */
+        .dark .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        
+        /* 글래스모피즘 효과 */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 타이핑 애니메이션 */
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid #667eea;
+            white-space: nowrap;
+            animation: typing 3s steps(20, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #667eea; }
+        }
+        
+        /* 프로그레스 바 */
+        .progress-bar {
+            width: 0% !important;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: left;
+            background: linear-gradient(90deg, currentColor 0%, currentColor 100%);
+        }
+        
+        .progress-bar.animate {
+            animation: progressFill 1.5s ease-out forwards;
+        }
+        
+        @keyframes progressFill {
+            from { 
+                width: 0%; 
+                opacity: 0.7;
+            }
+            to { 
+                width: var(--target-width); 
+                opacity: 1;
+            }
+        }
+        
+        /* 스크롤 진행도 */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 9999;
+            transition: width 0.1s ease;
+        }
+        
+        /* 네비게이션 하이라이트 */
+        .nav-active {
+            color: #667eea !important;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        /* 부드러운 스크롤 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 카드 호버 효과 */
+        .project-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .dark .project-card:hover {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f4ff',
+                            500: '#667eea',
+                            600: '#5a67d8',
+                            700: '#4c51bf'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-300">
+    <!-- 스크롤 진행도 바 -->
+    <div class="scroll-progress"></div>
+    
+    <!-- 네비게이션 -->
+    <nav class="fixed top-0 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg z-50 border-b border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold gradient-text">김주용</div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="nav-link hover:text-primary-500 smooth-transition">홈</a>
+                    <a href="#about" class="nav-link hover:text-primary-500 smooth-transition">소개</a>
+                    <a href="#education" class="nav-link hover:text-primary-500 smooth-transition">학력·경력</a>
+                    <a href="#skills" class="nav-link hover:text-primary-500 smooth-transition">기술</a>
+                    <a href="#projects" class="nav-link hover:text-primary-500 smooth-transition">프로젝트</a>
+                    <a href="#contact" class="nav-link hover:text-primary-500 smooth-transition">연락처</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- 다크모드 토글 -->
+                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 smooth-transition">
+                        <i class="fas fa-moon dark:hidden text-gray-600"></i>
+                        <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+                    </button>
+                    
+                    <!-- 모바일 메뉴 버튼 -->
+                    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 모바일 메뉴 -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-2 space-y-2">
+                <a href="#home" class="block py-2 hover:text-primary-500">홈</a>
+                <a href="#about" class="block py-2 hover:text-primary-500">소개</a>
+                <a href="#education" class="block py-2 hover:text-primary-500">학력·경력</a>
+                <a href="#skills" class="block py-2 hover:text-primary-500">기술</a>
+                <a href="#projects" class="block py-2 hover:text-primary-500">프로젝트</a>
+                <a href="#contact" class="block py-2 hover:text-primary-500">연락처</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 히어로 섹션 -->
+    <section id="home" class="min-h-screen flex items-center justify-center gradient-bg relative overflow-hidden pt-20">
+        <!-- 배경 장식 -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white/10 animate-pulse-slow"></div>
+            <div class="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-white/5 animate-float"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="mb-8">
+                <img src="176DA1EF-5459-49BB-A6D7-DF786DF622A8_1_105_c.jpeg" alt="김주용 프로필" class="w-48 h-48 rounded-full mx-auto object-cover shadow-2xl border-4 border-white/20 hover:scale-105 smooth-transition cursor-pointer" id="profileImage">
+            </div>
+            
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">
+                안녕하세요, <span class="gradient-text">김주용</span>입니다
+            </h1>
+            
+            <div class="text-xl md:text-2xl text-white/90 mb-8 h-8">
+                <span id="typingText" class="typing-animation"></span>
+            </div>
+            
+            <p class="text-lg text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed">
+                사람의 마음과 행동을 고해상도로 들여다보고 돕는 것을 좋아하는 심리학 전공자입니다.<br>
+                현재는 심리학과 소프트웨어를 전공하며 사람과 컴퓨터에 대한 이해를 높이고 있습니다.
+                일상에서 아름다운 것을 찾고 직접 경험하기를 좋아합니다. 제가 좋아하는 회사는 애플입니다. 
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#about" class="px-8 py-3 bg-white text-primary-600 rounded-full font-medium hover:bg-gray-100 smooth-transition hover-lift">
+                    더 알아보기
+                </a>
+                <a href="#contact" class="px-8 py-3 border-2 border-white text-white rounded-full font-medium hover:bg-white hover:text-primary-600 smooth-transition hover-lift">
+                    연락하기
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 소개 섹션 -->
+    <section id="about" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">About Me</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-semibold mb-4">기본 정보</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-user text-primary-500"></i>
+                            <span><strong>이름:</strong> 김주용</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-birthday-cake text-primary-500"></i>
+                            <span><strong>생년월일:</strong> 2001.07.13 (만 23세)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-envelope text-primary-500"></i>
+                            <span><strong>이메일:</strong> chany010713@gmail.com</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-map-marker-alt text-primary-500"></i>
+                            <span><strong>위치:</strong> 대전광역시 유성구</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift smooth-transition">
+                    <h3 class="text-2xl font-semibold mb-6 text-center">현재 상태</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <div class="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                충남대학교 심리학과 재학중
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="inline-flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+                                ABC 부트캠프 수강중
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <p class="text-gray-600 dark:text-gray-400 italic">
+                                "경험을 통해 성장하며, 따뜻한 소통을 중요하게 여깁니다."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 학력/경력 섹션 -->
+    <section id="education" class="py-20 bg-gray-100 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">학력 & 경력</h2>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- 학력 -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-8 flex items-center">
+                        <i class="fas fa-graduation-cap text-primary-500 mr-3"></i>
+                        학력
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-semibold text-lg">충남대학교</h4>
+                                <span class="text-sm text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded">재학중</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">심리학과 | 2021.03 ~ 현재</p>
+                            <p class="text-sm mt-2"><strong>학점:</strong> 4.09 / 4.5</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-semibold text-lg">경상대학교</h4>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-600 px-2 py-1 rounded">자퇴</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">심리학과 | 2020.03 ~ 2021.01</p>
+                            <p class="text-sm mt-2"><strong>학점:</strong> 4.39 / 4.5</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-semibold text-lg">성주고등학교</h4>
+                                <span class="text-sm text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded">졸업</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">인문계열 | 2017.03 ~ 2020.02</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 경력 -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-8 flex items-center">
+                        <i class="fas fa-briefcase text-primary-500 mr-3"></i>
+                        주요 경력
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-semibold text-lg">충남대학교 심리학과</h4>
+                                <span class="text-sm text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded">진행중</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400">국가근로 | 2021.06 ~ 현재</p>
+                            <p class="text-sm mt-2">학과 사무실 업무 보조</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <h4 class="font-semibold text-lg">보문종합사회복지관</h4>
+                            <p class="text-gray-600 dark:text-gray-400">사회복무요원 | 2023.02 ~ 2024.10</p>
+                            <p class="text-sm mt-2">복지 서비스 지원, 행정업무 보조, 민원 응대</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <h4 class="font-semibold text-lg">삼성드림클래스</h4>
+                            <p class="text-gray-600 dark:text-gray-400">멘토 | 2022.02 ~ 2023.01</p>
+                            <p class="text-sm mt-2">중학생 멘토링 (학습 및 진로 지도)</p>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-700 rounded-lg p-6 shadow-md hover-lift smooth-transition">
+                            <h4 class="font-semibold text-lg">충남대학교 심리학과 학생회</h4>
+                            <p class="text-gray-600 dark:text-gray-400">부학생회장 | 2021.02 ~ 2022.12</p>
+                            <p class="text-sm mt-2">학생회 운영 보좌 및 부서 관리</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- 기술 섹션 -->
+    <section id="skills" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">기술 & 도구</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 개발 도구 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift smooth-transition animate-on-scroll">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-code text-4xl text-primary-500 mb-4"></i>
+                        <h3 class="text-xl font-semibold">개발 도구</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Python</span>
+                                <span class="text-sm text-gray-500">2/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-primary-500 h-2 rounded-full" data-percent="40"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>HTML/CSS/JS</span>
+                                <span class="text-sm text-gray-500">3/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-primary-500 h-2 rounded-full" data-percent="60"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Figma</span>
+                                <span class="text-sm text-gray-500">3/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-primary-500 h-2 rounded-full" data-percent="60"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 생산성 도구 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift smooth-transition animate-on-scroll">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-tools text-4xl text-green-500 mb-4"></i>
+                        <h3 class="text-xl font-semibold">생산성 도구</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Notion</span>
+                                <span class="text-sm text-gray-500">4/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-green-500 h-2 rounded-full" data-percent="80"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Obsidian</span>
+                                <span class="text-sm text-gray-500">4/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-green-500 h-2 rounded-full" data-percent="80"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>Excel</span>
+                                <span class="text-sm text-gray-500">3/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-green-500 h-2 rounded-full" data-percent="60"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 분석 도구 -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift smooth-transition animate-on-scroll">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-chart-bar text-4xl text-purple-500 mb-4"></i>
+                        <h3 class="text-xl font-semibold">분석 도구</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>jamovi</span>
+                                <span class="text-sm text-gray-500">3/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-purple-500 h-2 rounded-full" data-percent="60"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>NotebookLM</span>
+                                <span class="text-sm text-gray-500">4/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-purple-500 h-2 rounded-full" data-percent="80"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span>ChatGPT</span>
+                                <span class="text-sm text-gray-500">4/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="progress-bar bg-purple-500 h-2 rounded-full" data-percent="80"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 자격증 & 소프트스킬 -->
+            <div class="mt-16 grid md:grid-cols-2 gap-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-certificate text-yellow-500 mr-3"></i>
+                        자격증
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <i class="fas fa-car text-blue-500"></i>
+                            <div>
+                                <h4 class="font-medium">자동차운전면허증 (보통1종)</h4>
+                                <p class="text-sm text-gray-500">취득일: 2020.07.20</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                    <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-users text-blue-500 mr-3"></i>
+                        소프트스킬
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>리더십 (학생회 부회장 경험)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>소통 능력 (멘토링 경험)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>협업 능력 (단과대 운영위원회)</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>글로벌 마인드 (한일 교류 경험)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 프로젝트 섹션 -->
+    <section id="projects" class="py-20 bg-gray-100 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">프로젝트 & 활동</h2>
+            
+            <!-- 프로젝트 필터 -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="filter-btn active px-6 py-2 rounded-full bg-primary-500 text-white hover:bg-primary-600 smooth-transition" data-filter="all">
+                    전체
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary-500 hover:text-white smooth-transition" data-filter="web">
+                    웹 개발
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary-500 hover:text-white smooth-transition" data-filter="ai">
+                    AI/데이터
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary-500 hover:text-white smooth-transition" data-filter="education">
+                    교육
+                </button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 프로젝트 1: ABC 부트캠프 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="ai education">
+                    <div class="h-48 gradient-bg flex items-center justify-center">
+                        <i class="fas fa-brain text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">AI 기반 데이터 분석 프로젝트</h3>
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">진행중</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2025.01 ~ 현재</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            Python과 AI를 활용한 데이터 탐험 및 웹 애플리케이션 구현. ABC 부트캠프에서 다양한 프로젝트 경험을 쌓고 있습니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">Python</span>
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">AI</span>
+                            <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">데이터분석</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">데이터 분석가, 웹 개발자</span>
+                            <a href="https://github.com/River-181" class="text-primary-500 hover:text-primary-600">
+                                <i class="fab fa-github text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 프로젝트 2: 멜론 TOP 100 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="web">
+                    <div class="h-48 bg-gradient-to-br from-green-400 to-orange-400 flex items-center justify-center">
+                        <i class="fas fa-music text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">인터랙티브 음악 차트 대시보드</h3>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">완료</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2025.01</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            HTML, CSS, JavaScript를 활용한 반응형 웹사이트. 차트 시각화, 필터링, 다크모드 등 사용자 친화적 기능을 구현했습니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-2 py-1 rounded">HTML</span>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">CSS</span>
+                            <span class="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">JavaScript</span>
+                            <span class="text-xs bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 px-2 py-1 rounded">Tailwind</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">프론트엔드 개발자</span>
+                            <button class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-external-link-alt text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 프로젝트 3: AI 관상 프로그램 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="ai web">
+                    <div class="h-48 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                        <i class="fas fa-user-astronaut text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">Streamlit 기반 AI 관상 프로그램</h3>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">완료</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2025.01</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            OpenAI API와 Streamlit을 활용한 인터랙티브 웹앱. 사용자 입력을 바탕으로 AI가 관상 분석 결과를 제공합니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">Python</span>
+                            <span class="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Streamlit</span>
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">OpenAI API</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">풀스택 개발자</span>
+                            <button class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-external-link-alt text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 활동 1: 삼성드림클래스 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="education">
+                    <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-400 flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">삼성드림클래스 멘토링</h3>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">완료</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2022.02 ~ 2023.01</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            중학생 대상 학습 및 진로 지도 멘토링 활동. 학생들의 성장을 도우며 소통과 교육의 중요성을 배웠습니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">멘토링</span>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">교육</span>
+                            <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">진로지도</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">멘토</span>
+                            <span class="text-primary-500">
+                                <i class="fas fa-heart text-lg"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 활동 2: 학생회 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="education">
+                    <div class="h-48 bg-gradient-to-br from-yellow-400 to-orange-400 flex items-center justify-center">
+                        <i class="fas fa-users text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">심리학과 학생회 부회장</h3>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">완료</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2021.02 ~ 2022.12</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            학생회 운영 보좌 및 부서 관리를 담당하며 리더십과 조직 운영 능력을 기르고, 학과 발전을 위해 노력했습니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded">리더십</span>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">조직관리</span>
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">기획</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">부학생회장</span>
+                            <a href="https://cnu-psy-stu.notion.site/42-d6a294cc4e734ba1a183a9ff35fb127a" class="text-primary-500 hover:text-primary-600">
+                                <i class="fas fa-external-link-alt text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 활동 3: 한일 교류 -->
+                <div class="project-card bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-lg smooth-transition animate-on-scroll" data-category="education">
+                    <div class="h-48 bg-gradient-to-br from-red-400 to-pink-400 flex items-center justify-center">
+                        <i class="fas fa-globe-asia text-6xl text-white opacity-80"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-semibold">한일 방일 사업단 학생 대표</h3>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">완료</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">2018</p>
+                        <p class="text-gray-700 dark:text-gray-300 mb-4">
+                            한국과 일본 학생 간의 문화 교류 프로그램에서 학생 대표로 활동하며 글로벌 마인드와 국제적 소통 능력을 기렸습니다.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">국제교류</span>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">문화체험</span>
+                            <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">대표</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">학생 대표</span>
+                            <span class="text-primary-500">
+                                <i class="fas fa-flag text-lg"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 연락처 섹션 -->
+    <section id="contact" class="py-20">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16 gradient-text">연락하기</h2>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <p class="text-xl text-gray-600 dark:text-gray-400">
+                        새로운 기회와 협업에 언제나 열려있습니다!
+                    </p>
+                    <p class="text-lg text-gray-500 dark:text-gray-500 mt-2">
+                        언제든지 편하게 연락주세요 😊
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- 이메일 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover-lift smooth-transition cursor-pointer" onclick="copyToClipboard('chany010713@gmail.com', '이메일')">
+                        <div class="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-envelope text-red-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">이메일</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">chany010713@gmail.com</p>
+                        <p class="text-xs text-gray-500 mt-2">클릭해서 복사</p>
+                    </div>
+                    
+                    <!-- 전화번호 -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover-lift smooth-transition cursor-pointer" onclick="copyToClipboard('010-7515-6776', '전화번호')">
+                        <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-phone text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">전화</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">010-7515-6776</p>
+                        <p class="text-xs text-gray-500 mt-2">클릭해서 복사</p>
+                    </div>
+                    
+                    <!-- GitHub -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover-lift smooth-transition cursor-pointer" onclick="window.open('https://github.com/River-181', '_blank')">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fab fa-github text-gray-700 dark:text-gray-300 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">GitHub</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">@River-181</p>
+                        <p class="text-xs text-gray-500 mt-2">프로젝트 확인</p>
+                    </div>
+                    
+                    <!-- Notion -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 text-center shadow-lg hover-lift smooth-transition cursor-pointer" onclick="window.open('https://cnu-psy-stu.notion.site/42-d6a294cc4e734ba1a183a9ff35fb127a', '_blank')">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-book text-blue-500 text-2xl"></i>
+                        </div>
+                        <h3 class="font-semibold mb-2">Notion</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">학생회 활동</p>
+                        <p class="text-xs text-gray-500 mt-2">포트폴리오 확인</p>
+                    </div>
+                </div>
+                
+                <!-- 추가 정보 -->
+                <div class="mt-12 text-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-semibold mb-4">함께 일하고 싶으시다면?</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6">
+                            심리학적 통찰과 데이터 분석 역량을 바탕으로 사용자 중심의 솔루션을 만들어가고 싶습니다.<br>
+                            다양한 프로젝트와 협업 기회를 기다리고 있어요!
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <span class="px-4 py-2 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm">
+                                🧠 사용자 경험 연구
+                            </span>
+                            <span class="px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm">
+                                📊 데이터 분석
+                            </span>
+                            <span class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm">
+                                💻 웹 개발
+                            </span>
+                            <span class="px-4 py-2 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-full text-sm">
+                                🤖 AI 프로젝트
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 푸터 -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 gradient-text">김주용</h3>
+                    <p class="text-gray-400 mb-4">
+                        사람과 데이터를 연결하는 심리학도
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/River-181" class="text-gray-400 hover:text-white smooth-transition">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="mailto:chany010713@gmail.com" class="text-gray-400 hover:text-white smooth-transition">
+                            <i class="fas fa-envelope text-xl"></i>
+                        </a>
+                        <a href="https://cnu-psy-stu.notion.site/42-d6a294cc4e734ba1a183a9ff35fb127a" class="text-gray-400 hover:text-white smooth-transition">
+                            <i class="fas fa-book text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">빠른 링크</h4>
+                    <div class="space-y-2">
+                        <a href="#about" class="block text-gray-400 hover:text-white smooth-transition">소개</a>
+                        <a href="#education" class="block text-gray-400 hover:text-white smooth-transition">학력·경력</a>
+                        <a href="#skills" class="block text-gray-400 hover:text-white smooth-transition">기술</a>
+                        <a href="#projects" class="block text-gray-400 hover:text-white smooth-transition">프로젝트</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">현재 상태</h4>
+                    <div class="space-y-2 text-gray-400">
+                        <p>🎓 충남대학교 심리학과 재학</p>
+                        <p>📚 ABC 부트캠프 수강</p>
+                        <p>💼 새로운 기회 모색 중</p>
+                        <p>🌱 지속적인 성장 추구</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">
+                    &copy; 2025 김주용. 모든 권리 보유.
+                </p>
+                <p class="text-gray-500 text-sm mt-2">
+                    Made with ❤️ and lots of ☕
+                </p>
+            </div>
+        </div>
+    </footer>
