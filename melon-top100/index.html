@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멜론 TOP 100 차트 📈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .melon-gradient {
+            background: linear-gradient(135deg, #00C851 0%, #FFA000 100%);
+        }
+        .dark .gradient-bg {
+            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glassmorphism {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'melon': {
+                            'green': '#00C851',
+                            'orange': '#FFA000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300 scroll-smooth">
+    <!-- 헤더 -->
+    <header class="sticky top-0 z-50 glassmorphism">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 melon-gradient rounded-full flex items-center justify-center">
+                        <i class="fas fa-music text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">멜론 TOP 100</h1>
+                    <span class="text-sm bg-melon-green text-white px-2 py-1 rounded-full">2023.12.04</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- 검색창 -->
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="곡명, 아티스트 검색..."
+                            class="w-64 px-4 py-2 pl-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-melon-green text-gray-800 dark:text-white"
+                        >
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    
+                    <!-- 필터 버튼 -->
+                    <button 
+                        id="filterBtn"
+                        class="px-4 py-2 bg-melon-orange text-white rounded-full hover:bg-orange-600 transition-colors"
+                    >
+                        <i class="fas fa-filter mr-2"></i>필터
+                    </button>
+                    
+                    <!-- 통계 버튼 -->
+                    <button 
+                        id="statsBtn"
+                        class="px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors"
+                    >
+                        <i class="fas fa-chart-bar mr-2"></i>통계
+                    </button>
+                    
+                    <!-- 다크모드 토글 -->
+                    <button 
+                        id="darkModeToggle"
+                        class="p-2 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    >
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 필터 패널 -->
+        <div id="filterPanel" class="hidden mb-6 p-4 glassmorphism rounded-xl">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">장르</label>
+                    <select id="genreFilter" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-white">
+                        <option value="">전체 장르</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">발매년도</label>
+                    <select id="yearFilter" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-white">
+                        <option value="">전체 년도</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">정렬</label>
+                    <select id="sortFilter" class="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-white">
+                        <option value="rank">순위순</option>
+                        <option value="likes">좋아요 순</option>
+                        <option value="title">제목순</option>
+                        <option value="artist">아티스트순</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 차트 그리드 -->
+        <div id="chartGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- 음악 카드들이 여기에 동적으로 생성됩니다 -->
+        </div>
+
+        <!-- 로딩 스피너 -->
+        <div id="loadingSpinner" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-melon-green"></div>
+        </div>
+    </main>
+
+    <!-- 상세 정보 모달 -->
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white" id="modalTitle"></h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="modalContent">
+                    <!-- 모달 내용이 여기에 동적으로 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 모달 -->
+    <div id="statsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">📊 차트 통계</h2>
+                    <button id="closeStatsModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">장르별 분포</h3>
+                        <canvas id="genreChart"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">아티스트별 곡 수</h3>
+                        <canvas id="artistChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공유 모달 -->
+    <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white">🔗 공유하기</h2>
+                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="shareContent" class="space-y-4">
+                    <!-- 공유 버튼들이 여기에 생성됩니다 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 즐겨찾기 플로팅 버튼 -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button 
+            id="favoritesBtn"
+            class="w-14 h-14 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
+        >
+            <i class="fas fa-heart text-xl"></i>
+            <span id="favoritesCount" class="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">0</span>
+        </button>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
