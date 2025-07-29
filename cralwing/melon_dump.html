@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<title>MelOn::음악이 필요한 순간, 멜론</title>
+	<meta name="keywords" content="음악서비스, 멜론차트, 멜론TOP100, 최신음악, 인기가요, 뮤직비디오, 앨범, 플레이어, 스트리밍, 다운로드, 아티스트플러스, 아티스트채널" />
+	<meta name="description" content="No.1 뮤직플랫폼 멜론! 최신 트렌드부터 나를 아는 똑똑한 음악추천까지!" />
+	<meta name="viewport" content="width=device-width"/>
+	<script type="text/javascript" src="/resource/script/web/common/jquery-1.9.1.min.js"></script>
+	<link rel="stylesheet" href="/resource/style/web/common/melonweb_layout.css" type="text/css" />
+	<link rel="stylesheet" href="/resource/style/web/common/melonweb_comm.css" type="text/css" />
+	<script>
+	document.domain='melon.com';
+	var melonHome = 'https://www.melon.com';
+
+	$(function() {
+		if(window.opener){
+			$("body").addClass("scroll_dis");
+			$("#popup_wrap").css("display", "block");
+		} else {
+			$("#wrap").css("display", "block");
+		}
+	});
+
+	function goHomeNewPage(){
+		opener.location.href = melonHome;
+
+		window.close();
+	}
+
+	function goHome(){
+		location.href = melonHome;
+	}
+	</script>
+</head>
+<body>
+<div id="wrap" style="display: none;">
+	<div id="cont_wrap" class="clfix">
+			<div id="conts_section" class="pr_none">
+			<!-- contents -->
+				<div id="conts">
+					<!-- 140521_수정 공통 소스 -->
+                    <div class="sys_error">
+                        <p class="txt_emphs">페이지 접속이 지연되고 있습니다.</p>
+                        <p>접근하신 페이지의 <span class="fc_point">사용량이 많아 접속이 지연</span>되고 있습니다.<br />잠시 후 다시 이용해 주시기 바랍니다.<br />이용에 불편을 드려 대단히 죄송합니다.</p>
+                        <div class="wrap_btn_c line">
+                            <a href="javascript:;" onclick="javascript:goHome();" title="멜론 홈으로 이동하기 " class="btn btn_emphs_small"><span class="odd_span"><span class="even_span">멜론 홈으로 이동하기</span></span></a>
+                        </div>
+                    </div>
+                    <!-- //140521_수정 공통 소스 -->
+				</div>
+				<!-- //contents -->
+			</div>
+	</div>
+</div>
+<div id="popup_wrap" class="popup w560" style="display: none;">
+<!-- //131210_수정 -->
+	<h1 class="popup_title">페이지 오류 안내</h1>
+	<div class="popup_cntt">
+		<!-- 140521_수정 공통 소스 -->
+        <div class="sys_error">
+            <p class="txt_emphs">페이지를 찾을 수 없습니다.</p>
+            <p>요청하신 페이지를 찾을 수 없습니다.<br /><span class="fc_point">잘못된 경로로 접근</span> 하셨거나, <span class="fc_point">사용할 수 없는 웹사이트 주소</span>입니다.<br />이용에 불편을 드려 대단히 죄송합니다.</p>
+            <div class="wrap_btn_c line">
+                <a href="javascript:goHomeNewPage();" title="멜론 홈으로 이동하기 " class="btn btn_emphs_small"><span class="odd_span"><span class="even_span">멜론 홈으로 이동하기</span></span></a>
+            </div>
+        </div>
+        <!-- //140521_수정 공통 소스 -->
+	</div>
+</div>
+<script type="text/javascript" src="/resource/script/web/common/melonweb_openlib.js"></script>
+<script type="text/javascript" src="/resource/script/web/common/melonweb_comm.js"></script>
+<script type="text/javascript" src="/resource/script/web/common/melonweb_comm_ajax.js"></script>
+</body>
+</html>
