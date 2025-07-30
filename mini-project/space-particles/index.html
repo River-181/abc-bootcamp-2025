@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Space Particles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(45deg, #0a0a23, #1a1a3a, #2a1a4a);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            cursor: none;
+        }
+
+        canvas {
+            display: block;
+            background: radial-gradient(ellipse at center, #0f0f30 0%, #000 70%);
+        }
+
+        .info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #ffffff;
+            font-size: 18px;
+            text-shadow: 0 0 10px #00ffff;
+            z-index: 10;
+        }
+
+        .title {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 3em;
+            text-align: center;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #0088ff;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.8;
+        }
+
+        .cursor {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 0 0 20px #00ffff, inset 0 0 10px #ffffff;
+            transition: transform 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">🌌 우주 파티클 시뮬레이션</div>
+    <div class="title">SPACE PARTICLES</div>
+    <div class="cursor" id="cursor"></div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cursor = document.getElementById('cursor');
+
+        // Canvas 크기 설정
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 마우스 위치
+        const mouse = {
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        };
+
+        // 파티클 배열
+        const particles = [];
+        const particleCount = 150;
+        const maxDistance = 120;
+
+        // 파티클 클래스
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 2 + 1;
+                this.opacity = Math.random() * 0.8 + 0.2;
+                this.hue = Math.random() * 60 + 180; // 청색-보라색 계열
+                this.life = Math.random() * 100 + 100;
+                this.age = 0;
+            }
+
+            update() {
+                // 마우스와의 거리 계산
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // 마우스 근처에서 파티클이 끌려가는 효과
+                if (distance < 100) {
+                    const force = (100 - distance) / 100;
+                    this.vx += (dx / distance) * force * 0.01;
+                    this.vy += (dy / distance) * force * 0.01;
+                }
+
+                // 파티클 이동
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // 경계 처리 (반대편으로 이동)
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+
+                // 마찰력 적용
+                this.vx *= 0.995;
+                this.vy *= 0.995;
+
+                // 수명 처리
+                this.age++;
+                if (this.age > this.life) {
+                    this.reset();
+                }
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.age = 0;
+                this.life = Math.random() * 100 + 100;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                
+                // 파티클 그리기 (별 모양)
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 70%, 70%)`;
+                ctx.fill();
+                
+                // 반짝이는 효과
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = this.opacity * 0.8;
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        // 파티클 생성
+        function createParticles() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // 파티클 간 연결선 그리기
+        function drawConnections() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        const opacity = (maxDistance - distance) / maxDistance;
+                        
+                        ctx.save();
+                        ctx.globalAlpha = opacity * 0.3;
+                        ctx.strokeStyle = '#00ffff';
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        // 마우스 주변 연결선 그리기
+        function drawMouseConnections() {
+            particles.forEach(particle => {
+                const dx = mouse.x - particle.x;
+                const dy = mouse.y - particle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < maxDistance * 1.5) {
+                    const opacity = (maxDistance * 1.5 - distance) / (maxDistance * 1.5);
+                    
+                    ctx.save();
+                    ctx.globalAlpha = opacity * 0.6;
+                    ctx.strokeStyle = '#ffff00';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(mouse.x, mouse.y);
+                    ctx.lineTo(particle.x, particle.y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
+
+        // 배경에 별 그리기
+        function drawStars() {
+            ctx.save();
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 1;
+                
+                ctx.globalAlpha = Math.random() * 0.8;
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        // 애니메이션 루프
+        function animate() {
+            // 캔버스 클리어 (페이드 효과)
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 배경 별들 그리기 (가끔씩)
+            if (Math.random() < 0.001) {
+                drawStars();
+            }
+
+            // 파티클 업데이트 및 그리기
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            // 연결선 그리기
+            drawConnections();
+            drawMouseConnections();
+
+            requestAnimationFrame(animate);
+        }
+
+        // 이벤트 리스너
+        canvas.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            
+            // 커스텀 커서 위치 업데이트
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+            cursor.style.transform = 'scale(1.2)';
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            cursor.style.transform = 'scale(1)';
+        });
+
+        // 마우스 클릭 시 파티클 폭발 효과
+        canvas.addEventListener('click', (e) => {
+            for (let i = 0; i < 10; i++) {
+                const particle = new Particle();
+                particle.x = e.clientX + (Math.random() - 0.5) * 50;
+                particle.y = e.clientY + (Math.random() - 0.5) * 50;
+                particle.vx = (Math.random() - 0.5) * 5;
+                particle.vy = (Math.random() - 0.5) * 5;
+                particle.radius = Math.random() * 3 + 2;
+                particle.hue = Math.random() * 60 + 300; // 분홍-보라색
+                particles.push(particle);
+            }
+            
+            // 너무 많은 파티클 제거
+            if (particles.length > particleCount + 50) {
+                particles.splice(0, 10);
+            }
+        });
+
+        // 윈도우 리사이즈 처리
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // 키보드 이벤트 (스페이스바로 파티클 리셋)
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                particles.forEach(particle => particle.reset());
+            }
+        });
+
+        // 초기화 및 애니메이션 시작
+        createParticles();
+        animate();
+    </script>
+</body>
+</html>
