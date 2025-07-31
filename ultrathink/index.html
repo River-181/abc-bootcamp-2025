@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko" x-data="app()" x-init="init()" :class="{ 'dark': isDarkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뽀모도로 & 할 일 경험치</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <main class="container mx-auto max-w-lg p-4 mt-10">
+
+        <!-- 테마 전환 토글 -->
+        <div class="flex justify-end mb-6">
+            <button @click="toggleTheme" class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg x-show="!isDarkMode" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <svg x-show="isDarkMode" x-cloak class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </button>
+        </div>
+
+        <!-- 뽀모도로 타이머 -->
+        <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-2" x-text="timerState"></h1>
+            <p class="text-7xl font-mono mb-4" x-text="formattedTime"></p>
+            <div class="flex justify-center space-x-4">
+                <button @click="toggleTimer"
+                        class="px-6 py-2 rounded text-white font-semibold transition-transform transform hover:scale-105"
+                        :class="{ 'bg-indigo-500 hover:bg-indigo-600': !isRunning, 'bg-yellow-500 hover:bg-yellow-600': isRunning }">
+                    <span x-text="isRunning ? '일시정지' : '시작'"></span>
+                </button>
+                <button @click="resetTimer"
+                        class="px-6 py-2 rounded bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 font-semibold transition-transform transform hover:scale-105">
+                    초기화
+                </button>
+            </div>
+        </section>
+
+        <!-- 할 일 목록 -->
+        <section class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">할 일 목록</h2>
+                <p class="text-lg font-bold text-green-500">Total XP: <span x-text="totalXP"></span></p>
+            </div>
+            <form @submit.prevent="addTodo">
+                <div class="flex">
+                    <input type="text" x-model="newTodo" placeholder="새로운 할 일을 입력하세요..."
+                           class="flex-grow p-2 border rounded-l-md bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-r-md hover:bg-indigo-600 transition-colors">
+                        추가
+                    </button>
+                </div>
+            </form>
+            <ul class="mt-4 space-y-2" x-cloak>
+                <template x-for="todo in todos" :key="todo.id">
+                    <li x-transition
+                        class="flex items-center p-2 rounded"
+                        :class="{ 'bg-gray-100 dark:bg-gray-700': todo.completed }">
+                        <input type="checkbox" :id="'todo-' + todo.id" x-model="todo.completed" @change="toggleTodo(todo.id)" class="mr-3 h-5 w-5 text-indigo-500 focus:ring-indigo-500 border-gray-300 rounded">
+                        <label :for="'todo-' + todo.id" class="flex-grow cursor-pointer"
+                               :class="{ 'line-through text-gray-500': todo.completed }"
+                               x-text="todo.text"></label>
+                    </li>
+                </template>
+            </ul>
+        </section>
+    </main>
+
+    <audio id="notificationSound">
+        <source src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" type="audio/ogg">
+    </audio>
+
+    <script>
+        function app() {
+            return {
+                // 테마 상태
+                isDarkMode: false,
+
+                // 타이머 상태
+                timerState: '뽀모도로', // '뽀모도로', '짧은 휴식', '긴 휴식'
+                minutes: 25,
+                seconds: 0,
+                isRunning: false,
+                pomodoroCount: 0,
+                timerInterval: null,
+                originalTitle: document.title,
+
+                // 할 일 목록 상태
+                todos: [],
+                newTodo: '',
+                nextTodoId: 1,
+                totalXP: 0,
+
+                // 초기화
+                init() {
+                    // 시스템 테마 설정 감지
+                    this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                },
+
+                // 테마 관련 메서드
+                toggleTheme() {
+                    this.isDarkMode = !this.isDarkMode;
+                },
+
+                // 타이머 관련 computed property
+                get formattedTime() {
+                    return `${String(this.minutes).padStart(2, '0')}:${String(this.seconds).padStart(2, '0')}`;
+                },
+
+                // 타이머 관련 메서드
+                toggleTimer() {
+                    this.isRunning = !this.isRunning;
+                    if (this.isRunning) {
+                        document.title = this.originalTitle;
+                        this.startTimer();
+                    } else {
+                        clearInterval(this.timerInterval);
+                    }
+                },
+                startTimer() {
+                    this.timerInterval = setInterval(() => {
+                        if (this.seconds > 0) {
+                            this.seconds--;
+                        } else if (this.minutes > 0) {
+                            this.minutes--;
+                            this.seconds = 59;
+                        } else {
+                            this.handleSessionEnd();
+                        }
+                    }, 1000);
+                },
+                handleSessionEnd() {
+                    clearInterval(this.timerInterval);
+                    this.isRunning = false;
+                    this.playNotification();
+                    document.title = "⏰ 시간 종료!";
+
+                    if (this.timerState === '뽀모도로') {
+                        this.pomodoroCount++;
+                        if (this.pomodoroCount % 4 === 0) {
+                            this.timerState = '긴 휴식';
+                            this.minutes = 15;
+                        } else {
+                            this.timerState = '짧은 휴식';
+                            this.minutes = 5;
+                        }
+                    } else {
+                        this.timerState = '뽀모도로';
+                        this.minutes = 25;
+                    }
+                    this.seconds = 0;
+                },
+                resetTimer() {
+                    clearInterval(this.timerInterval);
+                    this.isRunning = false;
+                    document.title = this.originalTitle;
+                    switch (this.timerState) {
+                        case '짧은 휴식':
+                            this.minutes = 5;
+                            break;
+                        case '긴 휴식':
+                            this.minutes = 15;
+                            break;
+                        default: // 뽀모도로
+                            this.minutes = 25;
+                    }
+                    this.seconds = 0;
+                },
+                playNotification() {
+                    const sound = document.getElementById('notificationSound');
+                    if (sound) {
+                        sound.play().catch(e => console.error("오디오 재생 오류:", e));
+                    }
+                },
+
+                // 할 일 관련 메서드
+                addTodo() {
+                    if (this.newTodo.trim() === '') return;
+                    this.todos.push({
+                        id: this.nextTodoId++,
+                        text: this.newTodo.trim(),
+                        completed: false
+                    });
+                    this.newTodo = '';
+                },
+                toggleTodo(id) {
+                    const todo = this.todos.find(t => t.id === id);
+                    if (todo) {
+                        // Note: The 'completed' state is already toggled by x-model.
+                        // We just need to adjust XP based on the new state.
+                        this.totalXP += todo.completed ? 10 : -10;
+                    }
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
