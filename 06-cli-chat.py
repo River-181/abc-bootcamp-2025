@@ -1,11 +1,3 @@
-
-# massage = [
-#     {"role" : "system", "content" : "..."},     # 최초 히스토리
-#     {"role" : "user", "content" : "..."},       # user
-#     {"role" : "assistant", "content" : "..."},  # assistant
-#     {"roel" : "user", "content" : "..."},       # user
-# ]
-
 # 06-cli-chat.py
 
 from dotenv import load_dotenv
@@ -21,26 +13,22 @@ conversations = [   # 리스트로 저장
     {"role": "user", "content": "손님 어떤 일로 찾으셨나요?"},  # 사용자 메시지
 ] 
 
-while True:
-    user_content = input("[User] ").strip() # 사용자 입력
-    if user_content:
-        conversations.append({
-            "role": "user", 
-            "content": user_content,
-            })  # 사용자 메시지 추가
 
-        response = client.responses.create(
-            model="gpt-4o",
-            input=conversations,
-        )
+user_content = input("[User] ").strip() # 사용자 입력
+if user_content:
+    conversations.append({
+        "role": "user", 
+        "content": user_content,
+        })  # 사용자 메시지 추가
 
-        assistant_content: str = response.output_text
-        print("[AI]", assistant_content)
-        conversations.append({
-            "role" : "assistant", 
-            "content" : assistant_content
-        })
-    else:
-        print("종료합니다.")
-        break
+    response = client.responses.create(
+        model="gpt-4o",
+        input=conversations,
+    )
 
+    assistant_content: str = response.output_text
+    print("[AI]", assistant_content)
+    conversations.append({
+        "role" : "assistant", 
+        "content" : assistant_content
+    })

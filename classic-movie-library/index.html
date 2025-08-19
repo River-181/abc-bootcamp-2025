@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Movie Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Classic Movie Library</h1>
+        <p>영화사를 빛낸 불멸의 고전 30편</p>
+    </header>
+
+    <main>
+        <div id="movie-grid" class="movie-grid">
+            <!-- 영화 카드들이 JavaScript로 동적 생성됩니다 -->
+        </div>
+    </main>
+
+    <!-- 영화 상세 정보 팝업 모달 -->
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <img id="modal-poster" src="" alt="Movie Poster">
+                <div class="modal-info">
+                    <h2 id="modal-title"></h2>
+                    <p class="modal-director">감독: <span id="modal-director"></span></p>
+                    <p class="modal-year">개봉연도: <span id="modal-year"></span></p>
+                    <p class="modal-plot" id="modal-plot"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Classic Movie Library. 모든 권리 보유.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
